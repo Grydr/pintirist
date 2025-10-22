@@ -5,12 +5,7 @@ import { store } from '@/routes/login';
 import { Form, Head, Link } from '@inertiajs/react';
 import { useState } from 'react';
 
-interface LoginProps {
-    status?: string;
-    canResetPassword: boolean;
-}
-
-export default function Login({ status, canResetPassword }: LoginProps) {
+export default function Login() {
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
 
