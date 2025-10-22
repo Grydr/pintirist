@@ -25,13 +25,13 @@ export default function PinterestSideNav({ active = "home", onSelect = () => {} 
 
   return (
     <aside
-      className="relative w-[72px] h-[651.2px] overflow-y-auto bg-white flex flex-col items-center [padding:0px_0.8px_0px_0px]"
+      className="fixed top-0 left-0 w-[72px] h-screen overflow-y-auto bg-white flex flex-col items-center [padding:0px_0.8px_0px_0px] z-40"
       aria-label="Pinterest side navigation"
     >
       {/* Inner column (48px) with vertical layout like your Figma */}
-      <div className="w-[48px] h-[651.2px] flex flex-col items-start justify-center py-4">
+      <div className="w-[48px] h-full flex flex-col items-start justify-center py-4">
         {/* Two main vertical groups with a large gap (163.2px) */}
-        <div className="w-[48px] h-[619.2px] flex flex-col items-center gap-[163.2px]">
+        <div className="w-[48px] h-full flex flex-col items-center gap-[163.2px]">
           {/* Top cluster (logo + 6 items) */}
           <div className="w-[48px] h-[408px] flex flex-col items-center gap-6">
             {/* Pinterest Logo */}
