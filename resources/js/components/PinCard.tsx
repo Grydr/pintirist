@@ -13,7 +13,7 @@ export default function PinCard({
 }: PinCardProps) {
   const img = (
     <img
-      className={`w-full ${rounded} aspect-auto break-inside-avoid`}
+      className={`w-full ${rounded} aspect-auto break-inside-avoid border-2 shadow`}
       src={src}
       alt={alt}
       loading="lazy"
