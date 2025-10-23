@@ -25,10 +25,7 @@ class BoardApiController extends Controller
     {
         $board = $request->user()->boards()->create($request->validated());
 
-        return (new BoardResource($board->loadCount('pins')))
-            ->additional(['message' => 'Board created'])
-            ->response()
-            ->setStatusCode(201);
+        return redirect()->back()->with('success', 'Board created');
     }
 
     public function show(Request $request, Board $board)
@@ -62,6 +59,6 @@ class BoardApiController extends Controller
 
         $board->delete();
 
-        return response()->json(['message' => 'Board deleted']);
+        return redirect()->back()->with('success', 'Board deleted');
     }
 }
