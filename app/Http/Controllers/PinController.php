@@ -94,13 +94,15 @@ class PinController extends Controller
         ]);
 
         $path = $request->file('image')->store('pins', 'public');
-        $url  = Storage::disk('public')->url($path);
+        
+        // Store as relative path: /storage/pins/filename.jpg
+        $imageUrl = '/storage/' . $path;
 
         Pin::create([
             'user_id'     => auth()->id(),
             'title'       => $validated['title'],
             'description' => $validated['description'] ?? null,
-            'image_url'  => $url,
+            'image_url'  => $imageUrl,
         ]);
 
         return redirect()->route('dashboard')->with('success', 'Pin published!');

@@ -21,8 +21,18 @@ class Pin extends Model
     {
         return Attribute::make(
             get: function ($value) {
-                // If it's already a full URL, return as is
+                // Handle null or empty value
+                if (empty($value)) {
+                    return null;
+                }
+                
+                // If it's a full URL with wrong domain, extract the path
                 if (str_starts_with($value, 'http://') || str_starts_with($value, 'https://')) {
+                    // Extract path from URL: http://localhost/storage/pins/file.jpg -> /storage/pins/file.jpg
+                    $parsedUrl = parse_url($value);
+                    if (isset($parsedUrl['path'])) {
+                        return url($parsedUrl['path']);
+                    }
                     return $value;
                 }
                 // If it starts with /storage, make it a full URL
