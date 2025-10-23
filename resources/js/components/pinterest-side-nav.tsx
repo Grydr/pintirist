@@ -1,7 +1,8 @@
 import { dashboard } from "@/routes";
 import { Link } from "@inertiajs/react";
-import { Home, Compass, LayoutGrid, Plus, Bell, MessageCircleMore, Settings } from "lucide-react";
-import { NavUser } from "./nav-user";
+import { Home, Compass, LayoutGrid, Plus, Bell, MessageCircleMore, Settings, User } from "lucide-react";
+import { usePage } from "@inertiajs/react";
+import type { SharedData } from "@/types";
 
 interface PinterestSideNavProps {
   active?: string;
@@ -15,6 +16,8 @@ interface NavItem {
 }
 
 export default function PinterestSideNav({ active = "home", onSelect = () => {} }: PinterestSideNavProps) {
+  const { auth } = usePage<SharedData>().props;
+  
   const topItems: NavItem[] = [
     { key: "home", label: "Home", Icon: Home },
     { key: "explore", label: "Explore", Icon: Compass },
@@ -59,9 +62,8 @@ export default function PinterestSideNav({ active = "home", onSelect = () => {} 
             {topItems.map(({ key, label, Icon }) => {
               if (key === 'home') {
                 return (
-                <Link href={dashboard()} prefetch>
+                <Link key={key} href={dashboard()} prefetch>
                 <NavIconButton
-                  key={key}
                   label={label}
                   active={active === key}
                   onClick={() => onSelect(key)}
@@ -86,7 +88,7 @@ export default function PinterestSideNav({ active = "home", onSelect = () => {} 
           </div>
 
           {/* Bottom settings */}
-          <div className="flex flex-col items-center">
+          <div className="flex flex-col items-center gap-2">
             <NavIconButton
               label={bottomItem.label}
               active={active === bottomItem.key}
@@ -94,7 +96,28 @@ export default function PinterestSideNav({ active = "home", onSelect = () => {} 
             >
               <bottomItem.Icon size={24} />
             </NavIconButton>
-            <NavUser />
+            
+            {/* User Profile Button */}
+            {auth?.user && (
+              <button
+                type="button"
+                aria-label="User Profile"
+                title={auth.user.name}
+                className="w-[48px] h-[48px] flex items-center justify-center rounded-full overflow-hidden hover:ring-2 hover:ring-gray-300 transition-all"
+              >
+                {auth.user.profile_image_url ? (
+                  <img 
+                    src={auth.user.profile_image_url as string} 
+                    alt={auth.user.name}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                    <User size={24} className="text-gray-600" />
+                  </div>
+                )}
+              </button>
+            )}
           </div>
         </div>
       </div>

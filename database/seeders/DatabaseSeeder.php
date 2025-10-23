@@ -13,15 +13,20 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
+        // Create test user
         User::firstOrCreate(
             ['email' => 'test@example.com'],
             [
                 'name' => 'Test User',
-                'password' => 'password',
+                'password' => bcrypt('password'),
                 'email_verified_at' => now(),
+                'date_of_birth' => '1990-01-01',
             ]
         );
+
+        // Seed boards with pins
+        $this->call([
+            BoardSeeder::class,
+        ]);
     }
 }
