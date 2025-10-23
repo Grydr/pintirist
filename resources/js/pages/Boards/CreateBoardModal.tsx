@@ -50,7 +50,7 @@ export default function CreateBoardModal({ onClose }: CreateBoardModalProps) {
                     </svg>
                 </button>
 
-                <h2 className="text-2xl font-bold text-center mb-8">
+                <h2 className="text-2xl font-bold text-center mb-8 text-gray-900">
                     Create board
                 </h2>
 
