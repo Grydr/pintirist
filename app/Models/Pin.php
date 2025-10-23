@@ -20,7 +20,7 @@ class Pin extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function board(): BelongsToMany
+    public function boards(): BelongsToMany
     {
         return $this->belongsToMany(Board::class, 'board_pin')->withTimestamps();
     }
