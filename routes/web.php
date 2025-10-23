@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\BoardApiController;
 use App\Http\Controllers\Api\BoardPinApiController;
+use App\Http\Controllers\PinController;
 use App\Models\Board;
 use App\Models\Pin;
 use Illuminate\Support\Facades\Route;
@@ -25,7 +26,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             ->withCount('pins')
             ->latest()
             ->get();
-        
+
         return Inertia::render('Boards/Index', [
             'boards' => ['data' => $boards]
         ]);
@@ -52,6 +53,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
             'availablePins' => ['data' => $availablePins]
         ]);
     })->name('boards.show');
+
+    Route::get('/pins/create', [PinController::class, 'create'])->name('pins.create');
+    Route::post('/pins', [PinController::class, 'store'])->name('pins.store');
 });
 
 // Board API routes (JSON responses for headless backend)

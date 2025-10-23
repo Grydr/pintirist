@@ -3,6 +3,7 @@ import { Link } from "@inertiajs/react";
 import { Home, Compass, LayoutGrid, Plus, Bell, MessageCircleMore, Settings, User } from "lucide-react";
 import { usePage } from "@inertiajs/react";
 import type { SharedData } from "@/types";
+import { create } from "@/routes/pins";
 
 interface PinterestSideNavProps {
   active?: string;
@@ -81,6 +82,21 @@ export default function PinterestSideNav({ active = "home", onSelect = () => {} 
                     <Icon size={24} />
                     </NavIconButton>
                 </Link>
+                )
+              }
+
+              if (key === itemKeys.CREATE) {
+                return (
+                    <Link key={key} href={create()} prefetch>
+                        <NavIconButton
+                        key={key}
+                        label={label}
+                        active={active === key}
+                        onClick={() => onSelect(key)}
+                        >
+                        <Icon size={24} />
+                        </NavIconButton>
+                    </Link>
                 )
               }
 

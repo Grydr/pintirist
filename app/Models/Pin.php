@@ -6,32 +6,27 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Storage;
 
 class Pin extends Model
 {
     protected $fillable = [
-        'image_url',
+        'user_id',        // ✅ allow setting user
         'title',
-        'description'
+        'description',
+        'image_url'
     ];
 
-    public function user(): BelongsTo
+    // expose image_url derived from image_path
+    protected $appends = ['image_url'];
+
+    public function getImageUrlAttribute(): ?string
     {
-        return $this->belongsTo(User::class);
+        return $this->image_path ? Storage::url($this->image_path) : null;
     }
 
-    public function boards(): BelongsToMany
-    {
-        return $this->belongsToMany(Board::class, 'board_pin')->withTimestamps();
-    }
-
-    public function comments(): HasMany
-    {
-        return $this->hasMany(Comment::class);
-    }
-
-    public function likedBy(): BelongsToMany
-    {
-        return $this->belongsToMany(User::class, 'likes');
-    }
+    public function user(): BelongsTo { return $this->belongsTo(User::class); }
+    public function boards(): BelongsToMany { return $this->belongsToMany(Board::class, 'board_pin')->withTimestamps(); }
+    public function comments(): HasMany { return $this->hasMany(Comment::class); }
+    public function likedBy(): BelongsToMany { return $this->belongsToMany(User::class, 'likes'); }
 }
