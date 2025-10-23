@@ -54,7 +54,7 @@ export default function PinterestSideNav({ active, onSelect = () => {} }: Pinter
     { key: itemKeys.HOME, label: "Home", Icon: Home, href: dashboard.url()},
     { key: itemKeys.EXPLORE, label: "Explore", Icon: Compass}, // ❌ BELUM ADA ROUTE
     { key: itemKeys.BOARDS, label: "Your boards", Icon: LayoutGrid, href: boards.url()},
-    { key: itemKeys.CREATE, label: "Create", Icon: Plus}, // ❌ BELUM ADA ROUTE
+    { key: itemKeys.CREATE, label: "Create", Icon: Plus, href: create.url()},
     { key: itemKeys.UPDATES, label: "Updates", Icon: Bell}, // ❌ BELUM ADA ROUTE
     { key: itemKeys.MESSAGES, label: "Messages", Icon: MessageCircleMore}, // ❌ BELUM ADA ROUTE
   ];
