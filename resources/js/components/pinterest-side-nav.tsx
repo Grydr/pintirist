@@ -1,10 +1,11 @@
 import { dashboard, boards } from "@/routes";
 import { edit as profileEdit } from "@/routes/profile";
-import { Link } from "@inertiajs/react";
-import { Home, Compass, LayoutGrid, Plus, Bell, MessageCircleMore, Settings, User } from "lucide-react";
+import { Link, router } from "@inertiajs/react";
+import { Home, Compass, LayoutGrid, Plus, Bell, MessageCircleMore, Settings, User, LogOut } from "lucide-react";
 import { usePage } from "@inertiajs/react";
 import type { SharedData } from "@/types";
 import { create } from "@/routes/pins";
+import { useState } from "react";
 
 interface PinterestSideNavProps {
   active?: string;
@@ -29,6 +30,23 @@ const itemKeys = {
 
 export default function PinterestSideNav({ active, onSelect = () => {} }: PinterestSideNavProps) {
   const { auth } = usePage<SharedData>().props;
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [menuTimeout, setMenuTimeout] = useState<NodeJS.Timeout | null>(null);
+
+  const handleMouseEnter = () => {
+    if (menuTimeout) {
+      clearTimeout(menuTimeout);
+      setMenuTimeout(null);
+    }
+    setShowProfileMenu(true);
+  };
+
+  const handleMouseLeave = () => {
+    const timeout = setTimeout(() => {
+      setShowProfileMenu(false);
+    }, 200); // Delay 200ms before hiding
+    setMenuTimeout(timeout);
+  };
 
   // Auto-detect active menu based on current URL if not explicitly set
   const getActiveMenu = (): string => {
@@ -60,11 +78,11 @@ export default function PinterestSideNav({ active, onSelect = () => {} }: Pinter
 
   return (
     <aside
-      className="fixed top-0 left-0 w-[72px] h-screen overflow-y-auto bg-white flex flex-col items-center [padding:0px_0.8px_0px_0px] z-40"
+      className="fixed top-0 left-0 w-[72px] h-screen overflow-visible bg-white flex flex-col items-center [padding:0px_0.8px_0px_0px] z-40"
       aria-label="Pinterest side navigation"
     >
       {/* Inner column (48px) with vertical layout like your Figma */}
-      <div className="w-[48px] h-full flex flex-col items-start justify-center py-4">
+      <div className="w-[48px] h-full flex flex-col items-start justify-center py-4 overflow-visible">
         {/* Two main vertical groups with a large gap (163.2px) */}
         <div className="w-[48px] h-full flex flex-col items-center gap-[163.2px]">
           {/* Top cluster (logo + 6 items) */}
@@ -143,26 +161,71 @@ export default function PinterestSideNav({ active, onSelect = () => {} }: Pinter
               </NavIconButton>
             )}
 
-            {/* User Profile Button */}
+            {/* User Profile Button with Dropdown */}
             {auth?.user && (
-              <button
-                type="button"
-                aria-label="User Profile"
-                title={auth.user.name}
-                className="w-[48px] h-[48px] flex items-center justify-center rounded-full overflow-hidden hover:ring-2 hover:ring-gray-300 transition-all"
+              <div 
+                className="relative"
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}
               >
-                {auth.user.profile_image_url ? (
-                  <img
-                    src={auth.user.profile_image_url as string}
-                    alt={auth.user.name}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-                    <User size={24} className="text-gray-600" />
-                  </div>
+                <button
+                  type="button"
+                  aria-label="User Profile"
+                  title={auth.user.name}
+                  className="w-[48px] h-[48px] flex items-center justify-center rounded-full overflow-hidden hover:ring-2 hover:ring-gray-300 transition-all"
+                >
+                  {auth.user.profile_image_url ? (
+                    <img
+                      src={auth.user.profile_image_url as string}
+                      alt={auth.user.name}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                      <User size={24} className="text-gray-600" />
+                    </div>
+                  )}
+                </button>
+
+                {/* Dropdown Menu with Bridge */}
+                {showProfileMenu && (
+                  <>
+                    {/* Invisible bridge to connect button and menu */}
+                    <div className="fixed left-[72px] bottom-4 w-[12px] h-[48px] z-[9998]" />
+                    
+                    <div 
+                      className="fixed left-[84px] bottom-4 w-56 bg-white rounded-xl shadow-2xl border border-gray-200 py-2 z-[9999]"
+                      onMouseEnter={handleMouseEnter}
+                      onMouseLeave={handleMouseLeave}
+                    >
+                      {/* User Info */}
+                      <div className="px-4 py-3 border-b border-gray-200">
+                        <p className="font-semibold text-gray-900 truncate">{auth.user.name}</p>
+                        <p className="text-sm text-gray-600 truncate">{auth.user.email}</p>
+                      </div>
+
+                      {/* Menu Items */}
+                      <div className="py-1">
+                        <Link
+                          href="/settings/profile"
+                          className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                        >
+                          <Settings size={18} />
+                          <span>Settings</span>
+                        </Link>
+                        
+                        <button
+                          onClick={() => router.post('/logout')}
+                          className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors text-left"
+                        >
+                          <LogOut size={18} />
+                          <span>Logout</span>
+                        </button>
+                      </div>
+                    </div>
+                  </>
                 )}
-              </button>
+              </div>
             )}
           </div>
         </div>
