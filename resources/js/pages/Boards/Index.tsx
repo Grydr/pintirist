@@ -27,7 +27,7 @@ interface BoardsIndexProps {
 export default function Index({ boards }: BoardsIndexProps) {
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [notification, setNotification] = useState<string | null>(null);
-    const { flash } = usePage().props as any;
+    const { flash } = usePage<{ flash?: { success?: string } }>().props;
     const boardsList = boards.data || [];
 
     // Show notification when flash message exists

@@ -35,7 +35,7 @@ export default function Show({ board, availablePins }: ShowProps) {
     const [showAddPinModal, setShowAddPinModal] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
     const [notification, setNotification] = useState<string | null>(null);
-    const { flash } = usePage().props as any;
+    const { flash } = usePage<{ flash?: { success?: string } }>().props;
 
     // Show notification when flash message exists
     useEffect(() => {

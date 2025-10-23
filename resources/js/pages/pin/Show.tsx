@@ -38,7 +38,7 @@ export default function Show({ pin, boards, isLiked: isLikedProp }: Props) {
 
     const [isSaveLoading, setSaveLoading] = useState(false);
     const [notification, setNotification] = useState<string | null>(null);
-    const { flash } = usePage().props as any;
+    const { flash } = usePage<{ flash?: { success?: string } }>().props;
 
     useEffect(() => {
         setLiked(isLikedProp);
