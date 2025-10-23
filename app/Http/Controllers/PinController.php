@@ -68,7 +68,7 @@ class PinController extends Controller
         ]);
 
         $path = $request->file('image')->store('pins', 'public');
-        $url  = Storage::url($path);
+        $url  = Storage::disk('public')->url($path);
 
         Pin::create([
             'user_id'     => auth()->id(),

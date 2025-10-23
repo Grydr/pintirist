@@ -96,7 +96,11 @@ export default function Show({ pin, boards, isLiked: isLikedProp }: Props) {
         );
     };
 
-    const handleClose = () => router.visit("/");
+    const handleClose = () => {
+        // Simply go back to previous page
+        // This works whether coming from dashboard, board detail, or anywhere else
+        window.history.back();
+    };
 
     return (
         <PinterestLayout active="pins">

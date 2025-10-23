@@ -144,7 +144,10 @@ export default function Show({ board, availablePins }: ShowProps) {
                                     key={pin.id}
                                     className="mb-6 break-inside-avoid group relative"
                                 >
-                                    <div className="relative rounded-2xl overflow-hidden">
+                                    <div 
+                                        className="relative rounded-2xl overflow-hidden cursor-pointer"
+                                        onClick={() => router.visit(`/pin/${pin.id}`)}
+                                    >
                                         <img
                                             src={pin.image_url}
                                             alt={pin.title}
@@ -152,9 +155,10 @@ export default function Show({ board, availablePins }: ShowProps) {
                                         />
                                         <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity">
                                             <button
-                                                onClick={() =>
-                                                    handleRemovePin(pin.id)
-                                                }
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleRemovePin(pin.id);
+                                                }}
                                                 className="absolute top-3 right-3 bg-white text-gray-900 p-2 rounded-full hover:bg-gray-100 transition"
                                             >
                                                 <svg

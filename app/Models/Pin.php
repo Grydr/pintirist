@@ -2,11 +2,11 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Support\Facades\Storage;
 
 class Pin extends Model
 {
@@ -17,9 +17,22 @@ class Pin extends Model
         'image_url'
     ];
 
-    public function getImageUrlAttribute(): ?string
+    protected function imageUrl(): Attribute
     {
-        return $this->image_path ? Storage::url($this->image_path) : null;
+        return Attribute::make(
+            get: function ($value) {
+                // If it's already a full URL, return as is
+                if (str_starts_with($value, 'http://') || str_starts_with($value, 'https://')) {
+                    return $value;
+                }
+                // If it starts with /storage, make it a full URL
+                if (str_starts_with($value, '/storage')) {
+                    return url($value);
+                }
+                // Otherwise return as is
+                return $value;
+            }
+        );
     }
 
     public function user(): BelongsTo { return $this->belongsTo(User::class); }
