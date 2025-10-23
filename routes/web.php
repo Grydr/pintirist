@@ -56,6 +56,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/pins/create', [PinController::class, 'create'])->name('pins.create');
     Route::post('/pins', [PinController::class, 'store'])->name('pins.store');
+
+    // Pin detail page
+    Route::get('/pin/{pin}', [PinController::class, 'show'])->name('pins.show');
+    Route::post('/pin/{pin}/like', [PinController::class, 'toggleLike'])->name('pins.like');
+    Route::post('/pin/{pin}/save', [PinController::class, 'saveToBoard'])->name('pins.save');
 });
 
 // Board API routes (JSON responses for headless backend)

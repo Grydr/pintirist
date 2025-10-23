@@ -17,9 +17,6 @@ class Pin extends Model
         'image_url'
     ];
 
-    // expose image_url derived from image_path
-    protected $appends = ['image_url'];
-
     public function getImageUrlAttribute(): ?string
     {
         return $this->image_path ? Storage::url($this->image_path) : null;
