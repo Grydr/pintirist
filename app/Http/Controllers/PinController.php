@@ -53,7 +53,7 @@ class PinController extends Controller
 
         $board->pins()->syncWithoutDetaching($pin->id);
 
-        return redirect()->back();
+        return redirect()->back()->with('success', 'Pin saved to board');
     }
 
     public function create() {

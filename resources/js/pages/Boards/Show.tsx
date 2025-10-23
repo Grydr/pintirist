@@ -1,6 +1,7 @@
-import { Head, router } from "@inertiajs/react";
-import { useState } from "react";
+import { Head, router, usePage } from "@inertiajs/react";
+import { useState, useEffect } from "react";
 import PinterestLayout from "@/layouts/pinterest-layout";
+import Notification from "../../components/Notification";
 
 interface Pin {
     id: number;
@@ -33,6 +34,15 @@ export default function Show({ board, availablePins }: ShowProps) {
     const boardData = board.data;
     const [showAddPinModal, setShowAddPinModal] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
+    const [notification, setNotification] = useState<string | null>(null);
+    const { flash } = usePage().props as any;
+
+    // Show notification when flash message exists
+    useEffect(() => {
+        if (flash?.success) {
+            setNotification(flash.success);
+        }
+    }, [flash]);
 
     const handleRemovePin = (pinId: number) => {
         if (confirm("Remove this pin from board?")) {
@@ -258,6 +268,14 @@ export default function Show({ board, availablePins }: ShowProps) {
                         </div>
                     </div>
                 </div>
+            )}
+
+            {/* Notification */}
+            {notification && (
+                <Notification
+                    message={notification}
+                    onClose={() => setNotification(null)}
+                />
             )}
         </PinterestLayout>
     );

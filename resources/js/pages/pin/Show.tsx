@@ -1,6 +1,7 @@
-import { Head, router } from "@inertiajs/react";
+import { Head, router, usePage } from "@inertiajs/react";
 import PinterestLayout from "@/layouts/pinterest-layout";
 import { useState, useEffect } from "react";
+import Notification from "../../components/Notification";
 
 type User = {
     id: number;
@@ -36,6 +37,8 @@ export default function Show({ pin, boards, isLiked: isLikedProp }: Props) {
     const [isLikeLoading, setLikeLoading] = useState(false);
 
     const [isSaveLoading, setSaveLoading] = useState(false);
+    const [notification, setNotification] = useState<string | null>(null);
+    const { flash } = usePage().props as any;
 
     useEffect(() => {
         setLiked(isLikedProp);
@@ -44,6 +47,13 @@ export default function Show({ pin, boards, isLiked: isLikedProp }: Props) {
     useEffect(() => {
         setLikeCount(pin.likes_count || 0);
     }, [pin.likes_count]);
+
+    // Show notification when flash message exists
+    useEffect(() => {
+        if (flash?.success) {
+            setNotification(flash.success);
+        }
+    }, [flash]);
 
     const handleLike = () => {
         if (isLikeLoading) return; 
@@ -250,6 +260,14 @@ export default function Show({ pin, boards, isLiked: isLikedProp }: Props) {
                     </div>
                 </div>
             </div>
+
+            {/* Notification */}
+            {notification && (
+                <Notification
+                    message={notification}
+                    onClose={() => setNotification(null)}
+                />
+            )}
         </PinterestLayout>
     );
 }
