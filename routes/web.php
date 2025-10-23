@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\BoardApiController;
 use App\Http\Controllers\Api\BoardPinApiController;
+use App\Http\Controllers\PinController;
 use App\Models\Board;
 use App\Models\Pin;
 use Illuminate\Support\Facades\Route;
@@ -52,6 +53,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
             'availablePins' => ['data' => $availablePins]
         ]);
     })->name('boards.show');
+
+    // Pin detail page
+    Route::get('/pin/{pin}', [PinController::class, 'show'])->name('pins.show');
+    Route::post('/pin/{pin}/like', [PinController::class, 'toggleLike'])->name('pins.like');
+    Route::post('/pin/{pin}/save', [PinController::class, 'saveToBoard'])->name('pins.save');
 });
 
 // Board API routes (JSON responses for headless backend)
