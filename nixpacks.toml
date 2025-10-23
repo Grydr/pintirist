@@ -1,27 +1,38 @@
-# Railway Nixpacks configuration for Laravel
+# Nixpacks configuration for Laravel on Railway
+# Disable Railpack auto-detection to have full control
 
 [variables]
-PHP_VERSION = "8.2"
 NIXPACKS_NO_MUSL = "1"
 
+[phases.setup]
+nixPkgs = ["php82", "php82Packages.composer", "nodejs_20"]
+
 [phases.install]
-dependsOn = ["setup"]
 cmds = [
-  "composer install --no-dev --optimize-autoloader --no-scripts --no-interaction"
+  # Copy composer files
+  "cp composer.json composer.json.bak",
+  "cp composer.lock composer.lock.bak",
+  # Install PHP dependencies WITHOUT dev packages
+  "composer install --no-dev --optimize-autoloader --no-interaction",
+  # Install Node dependencies
+  "npm ci"
 ]
 
 [phases.build]
-dependsOn = ["install"]
 cmds = [
-  "npm ci",
+  # Build frontend assets
   "npm run build",
+  # Create Laravel directories
   "mkdir -p storage/framework/{sessions,views,cache,testing}",
-  "mkdir -p storage/logs bootstrap/cache",
+  "mkdir -p storage/logs",
+  "mkdir -p bootstrap/cache",
+  # Set permissions
   "chmod -R 775 storage bootstrap/cache",
+  # Cache Laravel
   "php artisan config:cache",
   "php artisan route:cache",
   "php artisan view:cache"
 ]
 
 [start]
-cmd = "php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=$PORT"
+cmd = "php artisan migrate --force && php artisan storage:link && php artisan serve --host=0.0.0.0 --port=$PORT"
