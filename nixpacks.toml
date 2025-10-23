@@ -1,5 +1,27 @@
-# Let Railway auto-detect Laravel (Railpack)
-# Only customize PHP version
+# Railway Nixpacks configuration for Laravel
 
 [variables]
 PHP_VERSION = "8.2"
+NIXPACKS_NO_MUSL = "1"
+
+[phases.install]
+dependsOn = ["setup"]
+cmds = [
+  "composer install --no-dev --optimize-autoloader --no-scripts --no-interaction"
+]
+
+[phases.build]
+dependsOn = ["install"]
+cmds = [
+  "npm ci",
+  "npm run build",
+  "mkdir -p storage/framework/{sessions,views,cache,testing}",
+  "mkdir -p storage/logs bootstrap/cache",
+  "chmod -R 775 storage bootstrap/cache",
+  "php artisan config:cache",
+  "php artisan route:cache",
+  "php artisan view:cache"
+]
+
+[start]
+cmd = "php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=$PORT"
