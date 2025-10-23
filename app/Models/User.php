@@ -27,7 +27,7 @@ class User extends Authenticatable
         'date_of_birth',
         'profile_image_url'
     ];
-
+    
     /**
      * The attributes that should be hidden for serialization.
      *

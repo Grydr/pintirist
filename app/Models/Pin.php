@@ -12,7 +12,8 @@ class Pin extends Model
     protected $fillable = [
         'image_url',
         'title',
-        'description'
+        'description',
+        'user_id'
     ];
 
     public function user(): BelongsTo
