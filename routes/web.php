@@ -14,8 +14,7 @@ Route::get('/', function () {
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {
-        $pins = Pin::where('user_id', auth()->id())
-            ->latest()
+        $pins = Pin::latest()
             ->get(['id', 'title', 'description', 'image_url', 'created_at']);
         
         return Inertia::render('dashboard', [
@@ -53,8 +52,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         }])->loadCount('pins');
 
         // Get available pins that user can add
-        $availablePins = Pin::where('user_id', auth()->id())
-            ->latest()
+        $availablePins = Pin::latest()
             ->get();
 
         return Inertia::render('Boards/Show', [
