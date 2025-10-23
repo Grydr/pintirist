@@ -26,13 +26,39 @@ class PinController extends Controller
             $is_liked = $pin->likedBy()->where('user_id', Auth::id())->exists();
         }
 
+        $can_update = Auth::check() ? auth()->user()->can('update', $pin) : false;
+
         $boards = auth()->user()->boards()->get();
 
         return inertia('pin/Show', [
             'pin' => $pin->load('user'),
             'boards' => $boards,
-            'isLiked' => $is_liked
+            'isLiked' => $is_liked,
+            'canUpdate' => $can_update
         ]);
+    }
+
+    public function update(Request $request, Pin $pin)
+    {
+        $this->authorize('update', $pin);
+
+        $validated = $request->validate([
+            'title' => 'nullable|string|max:255',
+            'description' => 'nullable|string|max:1000',
+        ]);
+
+        $pin->update($validated);
+
+        return redirect('/pin/' . $pin->id);
+    }
+
+    public function destroy(Pin $pin)
+    {
+        $this->authorize('delete', $pin);
+
+        $pin->delete();
+
+        return redirect('/');
     }
 
     public function toggleLike(Pin $pin)
