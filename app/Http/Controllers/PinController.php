@@ -59,7 +59,7 @@ class PinController extends Controller
 
         $pin->delete();
 
-        return redirect('/');
+        return redirect()->route('dashboard')->with('success', 'Pin deleted');
     }
 
     public function toggleLike(Pin $pin)

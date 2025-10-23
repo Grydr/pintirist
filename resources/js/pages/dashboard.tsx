@@ -3,7 +3,9 @@ import PinCard from '@/components/PinCard';
 import AppLayout from '@/layouts/app-layout';
 import { dashboard } from '@/routes';
 import { type BreadcrumbItem } from '@/types';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
+import { useState, useEffect } from 'react';
+import Notification from '@/components/Notification';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -25,9 +27,27 @@ type DashboardProps = {
 };
 
 export default function Dashboard({ pins }: DashboardProps) {
+    const [notification, setNotification] = useState<string | null>(null);
+    const { flash } = usePage<{ flash?: { success?: string } }>().props;
+
+    // Show notification when flash message exists
+    useEffect(() => {
+        if (flash?.success) {
+            setNotification(flash.success);
+        }
+    }, [flash]);
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Dashboard" />
+            
+            {/* Notification */}
+            {notification && (
+                <Notification 
+                    message={notification} 
+                    onClose={() => setNotification(null)} 
+                />
+            )}
             {pins.length === 0 ? (
                 <div className="flex flex-col items-center justify-center min-h-[60vh] text-center p-4">
                     <svg
