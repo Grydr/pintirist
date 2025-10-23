@@ -26,19 +26,29 @@ class Pin extends Model
                     return null;
                 }
                 
-                // If it's a full URL with wrong domain, extract the path
+                // If it's a full URL
                 if (str_starts_with($value, 'http://') || str_starts_with($value, 'https://')) {
-                    // Extract path from URL: http://localhost/storage/pins/file.jpg -> /storage/pins/file.jpg
                     $parsedUrl = parse_url($value);
-                    if (isset($parsedUrl['path'])) {
+                    $host = $parsedUrl['host'] ?? '';
+                    
+                    // If it's an external URL (not localhost/127.0.0.1), return as is
+                    if (!in_array($host, ['localhost', '127.0.0.1', ''])) {
+                        return $value;
+                    }
+                    
+                    // If it's localhost with wrong port, extract the path and fix it
+                    if (isset($parsedUrl['path']) && str_contains($parsedUrl['path'], '/storage/')) {
                         return url($parsedUrl['path']);
                     }
+                    
                     return $value;
                 }
+                
                 // If it starts with /storage, make it a full URL
                 if (str_starts_with($value, '/storage')) {
                     return url($value);
                 }
+                
                 // Otherwise return as is
                 return $value;
             }

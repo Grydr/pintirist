@@ -17,6 +17,10 @@ export default function PinCard({
       src={src}
       alt={alt}
       loading="lazy"
+      onError={(e) => {
+        console.error('Failed to load image:', src);
+        e.currentTarget.style.display = 'none';
+      }}
     />
   );
 
