@@ -52,11 +52,8 @@ export default function PinterestSideNav({ active, onSelect = () => {} }: Pinter
 
   const topItems: NavItem[] = [
     { key: itemKeys.HOME, label: "Home", Icon: Home, href: dashboard.url()},
-    // { key: itemKeys.EXPLORE, label: "Explore", Icon: Compass}, 
     { key: itemKeys.BOARDS, label: "Your boards", Icon: LayoutGrid, href: boards.url()},
-    { key: itemKeys.CREATE, label: "Create", Icon: Plus}, // ❌ BELUM ADA ROUTE
-    // { key: itemKeys.UPDATES, label: "Updates", Icon: Bell}, 
-    // { key: itemKeys.MESSAGES, label: "Messages", Icon: MessageCircleMore}, 
+    { key: itemKeys.CREATE, label: "Create", Icon: Plus, href: create.url()},
   ];
 
   const bottomItem: NavItem = { key: "settings", label: "Settings", Icon: Settings, href: profileEdit.url() };
