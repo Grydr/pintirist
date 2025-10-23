@@ -1,9 +1,6 @@
-import { Head, router, useForm } from "@inertiajs/react";
+import { Head, router, usePage, useForm } from "@inertiajs/react";
 import PinterestLayout from "@/layouts/pinterest-layout";
 import { useState, useEffect, FormEventHandler } from "react";
-import { Head, router, usePage } from "@inertiajs/react";
-import PinterestLayout from "@/layouts/pinterest-layout";
-import { useState, useEffect } from "react";
 import Notification from "../../components/Notification";
 
 type User = {
@@ -93,8 +90,6 @@ export default function Show({
             onFinish: () => setSaveLoading(false),
         });
     };
-    
-    const handleClose = () => router.visit("/");
 
     const handleOpenEditModal = () => {
         reset(); 
@@ -116,6 +111,8 @@ export default function Show({
             return;
         }
         router.delete(`/pin/${pin.id}`);
+    };
+    
     const handleClose = () => {
         // Simply go back to previous page
         // This works whether coming from dashboard, board detail, or anywhere else
@@ -322,6 +319,8 @@ export default function Show({
                         </form>
                     </div>
                 </div>
+            )}
+
             {/* Notification */}
             {notification && (
                 <Notification
