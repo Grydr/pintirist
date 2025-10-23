@@ -1,4 +1,4 @@
-import { Head, router } from "@inertiajs/react";
+import { Head, router,Link } from "@inertiajs/react";
 import { useState } from "react";
 import PinterestLayout from "@/layouts/pinterest-layout";
 
@@ -135,17 +135,19 @@ export default function Show({ board, availablePins }: ShowProps) {
                                     className="mb-6 break-inside-avoid group relative"
                                 >
                                     <div className="relative rounded-2xl overflow-hidden">
-                                        <img
-                                            src={pin.image_url}
-                                            alt={pin.title}
-                                            className="w-full h-auto"
-                                        />
-                                        <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <Link href={`/pin/${pin.id}`}>
+                                            <img
+                                                src={pin.image_url}
+                                                alt={pin.title}
+                                                className="w-full h-auto"
+                                            />
+                                        </Link>
+                                        <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
                                             <button
                                                 onClick={() =>
                                                     handleRemovePin(pin.id)
                                                 }
-                                                className="absolute top-3 right-3 bg-white text-gray-900 p-2 rounded-full hover:bg-gray-100 transition"
+                                                className="absolute top-3 right-3 bg-white text-gray-900 p-2 rounded-full hover:bg-gray-100 transition pointer-events-auto"
                                             >
                                                 <svg
                                                     className="w-5 h-5"
