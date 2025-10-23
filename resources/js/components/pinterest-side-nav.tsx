@@ -15,16 +15,25 @@ interface NavItem {
   Icon: React.ComponentType<{ size?: number }>;
 }
 
+const itemKeys = {
+    HOME: "home",
+    EXPLORE: "explore",
+    BOARDS: "boards",
+    CREATE: "create",
+    UPDATES: "updates",
+    MESSAGES: "messages",
+};
+
 export default function PinterestSideNav({ active = "home", onSelect = () => {} }: PinterestSideNavProps) {
   const { auth } = usePage<SharedData>().props;
-  
+
   const topItems: NavItem[] = [
-    { key: "home", label: "Home", Icon: Home },
-    { key: "explore", label: "Explore", Icon: Compass },
-    { key: "boards", label: "Your boards", Icon: LayoutGrid },
-    { key: "create", label: "Create", Icon: Plus },
-    { key: "updates", label: "Updates", Icon: Bell },
-    { key: "messages", label: "Messages", Icon: MessageCircleMore },
+    { key: itemKeys.HOME, label: "Home", Icon: Home },
+    { key: itemKeys.EXPLORE, label: "Explore", Icon: Compass },
+    { key: itemKeys.BOARDS, label: "Your boards", Icon: LayoutGrid },
+    { key: itemKeys.CREATE, label: "Create", Icon: Plus },
+    { key: itemKeys.UPDATES, label: "Updates", Icon: Bell },
+    { key: itemKeys.MESSAGES, label: "Messages", Icon: MessageCircleMore },
   ];
 
   const bottomItem: NavItem = { key: "settings", label: "Settings & Support", Icon: Settings };
@@ -60,16 +69,17 @@ export default function PinterestSideNav({ active = "home", onSelect = () => {} 
             </div>
 
             {topItems.map(({ key, label, Icon }) => {
-              if (key === 'home') {
+              if (key === itemKeys.HOME) {
                 return (
                 <Link key={key} href={dashboard()} prefetch>
-                <NavIconButton
-                  label={label}
-                  active={active === key}
-                  onClick={() => onSelect(key)}
-                >
-                  <Icon size={24} />
-                </NavIconButton>
+                    <NavIconButton
+                    key={key}
+                    label={label}
+                    active={active === key}
+                    onClick={() => onSelect(key)}
+                    >
+                    <Icon size={24} />
+                    </NavIconButton>
                 </Link>
                 )
               }
@@ -96,7 +106,7 @@ export default function PinterestSideNav({ active = "home", onSelect = () => {} 
             >
               <bottomItem.Icon size={24} />
             </NavIconButton>
-            
+
             {/* User Profile Button */}
             {auth?.user && (
               <button
@@ -106,8 +116,8 @@ export default function PinterestSideNav({ active = "home", onSelect = () => {} 
                 className="w-[48px] h-[48px] flex items-center justify-center rounded-full overflow-hidden hover:ring-2 hover:ring-gray-300 transition-all"
               >
                 {auth.user.profile_image_url ? (
-                  <img 
-                    src={auth.user.profile_image_url as string} 
+                  <img
+                    src={auth.user.profile_image_url as string}
                     alt={auth.user.name}
                     className="w-full h-full object-cover"
                   />
