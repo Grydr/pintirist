@@ -14,19 +14,27 @@ Route::get('/', function () {
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {
-        return Inertia::render('dashboard');
+        $pins = Pin::where('user_id', auth()->id())
+            ->latest()
+            ->get(['id', 'title', 'description', 'image_url', 'created_at']);
+        
+        return Inertia::render('dashboard', [
+            'pins' => $pins
+        ]);
     })->name('dashboard');
 
     // Boards page (Inertia render)
     Route::get('boards', function () {
         $boards = auth()->user()->boards()
             ->with(['pins' => function($query) {
-                $query->orderBy('pins.created_at', 'desc')->take(4);
+                $query->select('pins.id', 'pins.title', 'pins.image_url', 'pins.created_at')
+                      ->orderBy('board_pin.created_at', 'desc')
+                      ->take(4);
             }])
             ->withCount('pins')
             ->latest()
             ->get();
-        
+
         return Inertia::render('Boards/Index', [
             'boards' => ['data' => $boards]
         ]);
@@ -40,7 +48,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         }
 
         $board->load(['pins' => function($query) {
-            $query->latest();
+            $query->select('pins.id', 'pins.title', 'pins.description', 'pins.image_url', 'pins.created_at')
+                  ->orderBy('board_pin.created_at', 'desc');
         }])->loadCount('pins');
 
         // Get available pins that user can add
@@ -53,6 +62,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
             'availablePins' => ['data' => $availablePins]
         ]);
     })->name('boards.show');
+
+    Route::get('/pins/create', [PinController::class, 'create'])->name('pins.create');
+    Route::post('/pins', [PinController::class, 'store'])->name('pins.store');
 
     // Pin detail page
     Route::get('/pin/{pin}', [PinController::class, 'show'])->name('pins.show');

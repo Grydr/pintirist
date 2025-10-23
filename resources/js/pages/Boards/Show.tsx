@@ -1,6 +1,9 @@
 import { Head, router,Link } from "@inertiajs/react";
 import { useState } from "react";
+import { Head, router, usePage } from "@inertiajs/react";
+import { useState, useEffect } from "react";
 import PinterestLayout from "@/layouts/pinterest-layout";
+import Notification from "../../components/Notification";
 
 interface Pin {
     id: number;
@@ -33,6 +36,15 @@ export default function Show({ board, availablePins }: ShowProps) {
     const boardData = board.data;
     const [showAddPinModal, setShowAddPinModal] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
+    const [notification, setNotification] = useState<string | null>(null);
+    const { flash } = usePage<{ flash?: { success?: string } }>().props;
+
+    // Show notification when flash message exists
+    useEffect(() => {
+        if (flash?.success) {
+            setNotification(flash.success);
+        }
+    }, [flash]);
 
     const handleRemovePin = (pinId: number) => {
         if (confirm("Remove this pin from board?")) {
@@ -148,6 +160,22 @@ export default function Show({ board, availablePins }: ShowProps) {
                                                     handleRemovePin(pin.id)
                                                 }
                                                 className="absolute top-3 right-3 bg-white text-gray-900 p-2 rounded-full hover:bg-gray-100 transition pointer-events-auto"
+                                    <div 
+                                        className="relative rounded-2xl overflow-hidden cursor-pointer"
+                                        onClick={() => router.visit(`/pin/${pin.id}`)}
+                                    >
+                                        <img
+                                            src={pin.image_url}
+                                            alt={pin.title}
+                                            className="w-full h-auto"
+                                        />
+                                        <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleRemovePin(pin.id);
+                                                }}
+                                                className="absolute top-3 right-3 bg-white text-gray-900 p-2 rounded-full hover:bg-gray-100 transition"
                                             >
                                                 <svg
                                                     className="w-5 h-5"
@@ -260,6 +288,14 @@ export default function Show({ board, availablePins }: ShowProps) {
                         </div>
                     </div>
                 </div>
+            )}
+
+            {/* Notification */}
+            {notification && (
+                <Notification
+                    message={notification}
+                    onClose={() => setNotification(null)}
+                />
             )}
         </PinterestLayout>
     );

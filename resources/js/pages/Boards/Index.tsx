@@ -1,8 +1,9 @@
-import { Head } from "@inertiajs/react";
-import { useState } from "react";
+import { Head, usePage } from "@inertiajs/react";
+import { useState, useEffect } from "react";
 import PinterestLayout from "@/layouts/pinterest-layout";
 import CreateBoardModal from "./CreateBoardModal";
 import BoardCard from "./BoardCard";
+import Notification from "../../components/Notification";
 
 interface Board {
     id: number;
@@ -25,7 +26,16 @@ interface BoardsIndexProps {
 
 export default function Index({ boards }: BoardsIndexProps) {
     const [showCreateModal, setShowCreateModal] = useState(false);
+    const [notification, setNotification] = useState<string | null>(null);
+    const { flash } = usePage<{ flash?: { success?: string } }>().props;
     const boardsList = boards.data || [];
+
+    // Show notification when flash message exists
+    useEffect(() => {
+        if (flash?.success) {
+            setNotification(flash.success);
+        }
+    }, [flash]);
 
     return (
         <PinterestLayout active="boards">
@@ -139,6 +149,14 @@ export default function Index({ boards }: BoardsIndexProps) {
             {/* Create Board Modal */}
             {showCreateModal && (
                 <CreateBoardModal onClose={() => setShowCreateModal(false)} />
+            )}
+
+            {/* Notification */}
+            {notification && (
+                <Notification
+                    message={notification}
+                    onClose={() => setNotification(null)}
+                />
             )}
         </PinterestLayout>
     );

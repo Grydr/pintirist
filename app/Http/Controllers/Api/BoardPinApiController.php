@@ -22,7 +22,7 @@ class BoardPinApiController extends Controller
             $board->pins()->attach($pinId);
         }
 
-        return response()->json(['message' => 'Pin saved to board'], 201);
+        return redirect()->back()->with('success', 'Pin saved to board');
     }
 
     public function destroy(Request $request, Board $board, Pin $pin)
@@ -32,6 +32,6 @@ class BoardPinApiController extends Controller
 
         $board->pins()->detach($pin->id);
 
-        return response()->json(['message' => 'Pin removed from board']);
+        return redirect()->back()->with('success', 'Pin removed from board');
     }
 }

@@ -1,6 +1,10 @@
 import { Head, router, useForm } from "@inertiajs/react";
 import PinterestLayout from "@/layouts/pinterest-layout";
 import { useState, useEffect, FormEventHandler } from "react";
+import { Head, router, usePage } from "@inertiajs/react";
+import PinterestLayout from "@/layouts/pinterest-layout";
+import { useState, useEffect } from "react";
+import Notification from "../../components/Notification";
 
 type User = {
     id: number;
@@ -41,6 +45,8 @@ export default function Show({
     const [isLikeLoading, setLikeLoading] = useState(false);
     const [isSaveLoading, setSaveLoading] = useState(false);
     
+    const [notification, setNotification] = useState<string | null>(null);
+    const { flash } = usePage<{ flash?: { success?: string } }>().props;
 
     const [showEditModal, setShowEditModal] = useState(false);
 
@@ -58,6 +64,13 @@ export default function Show({
             description: pin.description || ""
         });
     }, [pin]);
+
+    // Show notification when flash message exists
+    useEffect(() => {
+        if (flash?.success) {
+            setNotification(flash.success);
+        }
+    }, [flash]);
 
     const handleLike = () => {
         if (isLikeLoading) return;
@@ -103,6 +116,10 @@ export default function Show({
             return;
         }
         router.delete(`/pin/${pin.id}`);
+    const handleClose = () => {
+        // Simply go back to previous page
+        // This works whether coming from dashboard, board detail, or anywhere else
+        window.history.back();
     };
 
     return (
@@ -305,6 +322,12 @@ export default function Show({
                         </form>
                     </div>
                 </div>
+            {/* Notification */}
+            {notification && (
+                <Notification
+                    message={notification}
+                    onClose={() => setNotification(null)}
+                />
             )}
         </PinterestLayout>
     );

@@ -1,8 +1,11 @@
-import { dashboard } from "@/routes";
-import { Link } from "@inertiajs/react";
-import { Home, Compass, LayoutGrid, Plus, Bell, MessageCircleMore, Settings, User } from "lucide-react";
+import { dashboard, boards } from "@/routes";
+import { edit as profileEdit } from "@/routes/profile";
+import { Link, router } from "@inertiajs/react";
+import { Home, Compass, LayoutGrid, Plus, Bell, MessageCircleMore, Settings, User, LogOut } from "lucide-react";
 import { usePage } from "@inertiajs/react";
 import type { SharedData } from "@/types";
+import { create } from "@/routes/pins";
+import { useState } from "react";
 
 interface PinterestSideNavProps {
   active?: string;
@@ -13,6 +16,7 @@ interface NavItem {
   key: string;
   label: string;
   Icon: React.ComponentType<{ size?: number }>;
+  href?: string;
 }
 
 const itemKeys = {
@@ -24,27 +28,61 @@ const itemKeys = {
     MESSAGES: "messages",
 };
 
-export default function PinterestSideNav({ active = "home", onSelect = () => {} }: PinterestSideNavProps) {
+export default function PinterestSideNav({ active, onSelect = () => {} }: PinterestSideNavProps) {
   const { auth } = usePage<SharedData>().props;
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [menuTimeout, setMenuTimeout] = useState<NodeJS.Timeout | null>(null);
+
+  const handleMouseEnter = () => {
+    if (menuTimeout) {
+      clearTimeout(menuTimeout);
+      setMenuTimeout(null);
+    }
+    setShowProfileMenu(true);
+  };
+
+  const handleMouseLeave = () => {
+    const timeout = setTimeout(() => {
+      setShowProfileMenu(false);
+    }, 200); // Delay 200ms before hiding
+    setMenuTimeout(timeout);
+  };
+
+  // Auto-detect active menu based on current URL if not explicitly set
+  const getActiveMenu = (): string => {
+    if (active) return active;
+
+    const currentPath = window.location.pathname;
+
+    if (currentPath.startsWith('/settings')) return 'settings';
+    if (currentPath.startsWith('/boards')) return itemKeys.BOARDS;
+    if (currentPath.startsWith('/dashboard')) return itemKeys.HOME;
+    if (currentPath.startsWith('/explore')) return itemKeys.EXPLORE;
+    if (currentPath.startsWith('/pins/create') || currentPath.startsWith('/create')) return itemKeys.CREATE;
+    if (currentPath.startsWith('/notifications') || currentPath.startsWith('/updates')) return itemKeys.UPDATES;
+    if (currentPath.startsWith('/messages')) return itemKeys.MESSAGES;
+    if (currentPath === '/') return itemKeys.HOME;
+
+    return itemKeys.HOME; // default
+  };
+
+  const activeMenu = getActiveMenu();
 
   const topItems: NavItem[] = [
-    { key: itemKeys.HOME, label: "Home", Icon: Home },
-    { key: itemKeys.EXPLORE, label: "Explore", Icon: Compass },
-    { key: itemKeys.BOARDS, label: "Your boards", Icon: LayoutGrid },
-    { key: itemKeys.CREATE, label: "Create", Icon: Plus },
-    { key: itemKeys.UPDATES, label: "Updates", Icon: Bell },
-    { key: itemKeys.MESSAGES, label: "Messages", Icon: MessageCircleMore },
+    { key: itemKeys.HOME, label: "Home", Icon: Home, href: dashboard.url()},
+    { key: itemKeys.BOARDS, label: "Your boards", Icon: LayoutGrid, href: boards.url()},
+    { key: itemKeys.CREATE, label: "Create", Icon: Plus, href: create.url()},
   ];
 
-  const bottomItem: NavItem = { key: "settings", label: "Settings & Support", Icon: Settings };
+  const bottomItem: NavItem = { key: "settings", label: "Settings", Icon: Settings, href: profileEdit.url() };
 
   return (
     <aside
-      className="fixed top-0 left-0 w-[72px] h-screen overflow-y-auto bg-white flex flex-col items-center [padding:0px_0.8px_0px_0px] z-40"
+      className="fixed top-0 left-0 w-[72px] h-screen overflow-visible bg-white flex flex-col items-center [padding:0px_0.8px_0px_0px] z-40"
       aria-label="Pinterest side navigation"
     >
       {/* Inner column (48px) with vertical layout like your Figma */}
-      <div className="w-[48px] h-full flex flex-col items-start justify-center py-4">
+      <div className="w-[48px] h-full flex flex-col items-start justify-center py-4 overflow-visible">
         {/* Two main vertical groups with a large gap (163.2px) */}
         <div className="w-[48px] h-full flex flex-col items-center gap-[163.2px]">
           {/* Top cluster (logo + 6 items) */}
@@ -68,65 +106,126 @@ export default function PinterestSideNav({ active = "home", onSelect = () => {} 
               </div>
             </div>
 
-            {topItems.map(({ key, label, Icon }) => {
-              if (key === itemKeys.HOME) {
+            {topItems.map(({ key, label, Icon, href }) => {
+              // Render with Link if route is implemented and has href
+              if (href) {
                 return (
-                <Link key={key} href={dashboard()} prefetch>
+                  <Link key={key} href={href} prefetch>
                     <NavIconButton
-                    key={key}
-                    label={label}
-                    active={active === key}
-                    onClick={() => onSelect(key)}
+                      label={label}
+                      active={activeMenu === key}
+                      onClick={() => onSelect(key)}
                     >
-                    <Icon size={24} />
+                      <Icon size={24} />
                     </NavIconButton>
-                </Link>
-                )
+                  </Link>
+                );
               }
 
+              // Render as disabled button if not implemented
               return (
-              <NavIconButton
-                key={key}
-                label={label}
-                active={active === key}
-                onClick={() => onSelect(key)}
-              >
-                <Icon size={24} />
-              </NavIconButton>
-              )
+                <NavIconButton
+                  key={key}
+                  label={label}
+                  active={false}
+                  onClick={() => onSelect(key)}
+                >
+                  <Icon size={24} />
+                </NavIconButton>
+              );
             })}
           </div>
 
           {/* Bottom settings */}
           <div className="flex flex-col items-center gap-2">
-            <NavIconButton
-              label={bottomItem.label}
-              active={active === bottomItem.key}
-              onClick={() => onSelect(bottomItem.key)}
-            >
-              <bottomItem.Icon size={24} />
-            </NavIconButton>
-
-            {/* User Profile Button */}
-            {auth?.user && (
-              <button
-                type="button"
-                aria-label="User Profile"
-                title={auth.user.name}
-                className="w-[48px] h-[48px] flex items-center justify-center rounded-full overflow-hidden hover:ring-2 hover:ring-gray-300 transition-all"
+            {bottomItem.href ? (
+              <Link href={bottomItem.href} prefetch>
+                <NavIconButton
+                  label={bottomItem.label}
+                  active={activeMenu === bottomItem.key}
+                  onClick={() => onSelect(bottomItem.key)}
+                >
+                  <bottomItem.Icon size={24} />
+                </NavIconButton>
+              </Link>
+            ) : (
+              <NavIconButton
+                label={`${bottomItem.label} (Coming Soon)`}
+                active={false}
+                onClick={() => {
+                  console.warn(`Route for "${bottomItem.label}" is not implemented yet`);
+                  onSelect(bottomItem.key);
+                }}
               >
-                {auth.user.profile_image_url ? (
-                  <img
-                    src={auth.user.profile_image_url as string}
-                    alt={auth.user.name}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-                    <User size={24} className="text-gray-600" />
-                  </div>
+                <bottomItem.Icon size={24} />
+              </NavIconButton>
+            )}
+
+            {/* User Profile Button with Dropdown */}
+            {auth?.user && (
+              <div 
+                className="relative"
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}
+              >
+                <button
+                  type="button"
+                  aria-label="User Profile"
+                  title={auth.user.name}
+                  className="w-[48px] h-[48px] flex items-center justify-center rounded-full overflow-hidden hover:ring-2 hover:ring-gray-300 transition-all"
+                >
+                  {auth.user.profile_image_url ? (
+                    <img
+                      src={auth.user.profile_image_url as string}
+                      alt={auth.user.name}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                      <User size={24} className="text-gray-600" />
+                    </div>
+                  )}
+                </button>
+
+                {/* Dropdown Menu with Bridge */}
+                {showProfileMenu && (
+                  <>
+                    {/* Invisible bridge to connect button and menu */}
+                    <div className="fixed left-[72px] bottom-4 w-[12px] h-[48px] z-[9998]" />
+                    
+                    <div 
+                      className="fixed left-[84px] bottom-4 w-56 bg-white rounded-xl shadow-2xl border border-gray-200 py-2 z-[9999]"
+                      onMouseEnter={handleMouseEnter}
+                      onMouseLeave={handleMouseLeave}
+                    >
+                      {/* User Info */}
+                      <div className="px-4 py-3 border-b border-gray-200">
+                        <p className="font-semibold text-gray-900 truncate">{auth.user.name}</p>
+                        <p className="text-sm text-gray-600 truncate">{auth.user.email}</p>
+                      </div>
+
+                      {/* Menu Items */}
+                      <div className="py-1">
+                        <Link
+                          href="/settings/profile"
+                          className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                        >
+                          <Settings size={18} />
+                          <span>Settings</span>
+                        </Link>
+                        
+                        <button
+                          onClick={() => router.post('/logout')}
+                          className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors text-left"
+                        >
+                          <LogOut size={18} />
+                          <span>Logout</span>
+                        </button>
+                      </div>
+                    </div>
+                  </>
                 )}
-              </button>
+              </div>
             )}
           </div>
         </div>
@@ -140,20 +239,24 @@ interface NavIconButtonProps {
   active: boolean;
   onClick: () => void;
   children: React.ReactNode;
+  disabled?: boolean; // Add disabled prop
 }
 
-function NavIconButton({ label, active, onClick, children }: NavIconButtonProps) {
+function NavIconButton({ label, active, onClick, children, disabled = false }: NavIconButtonProps) {
   return (
     <button
       type="button"
       aria-label={label}
       title={label}
       onClick={onClick}
+      disabled={disabled}
       className={[
         "w-[48px] h-[48px]",
         "flex flex-row items-center justify-center",
         "rounded-[16px]",
-        active
+        disabled
+          ? "text-gray-400 bg-gray-100 cursor-not-allowed opacity-50"
+          : active
           ? "bg-black text-white shadow-[inset_0_0_0_1px_rgba(0,0,0,0.04)]"
           : "text-black hover:bg-neutral-100 active:bg-neutral-200",
         "transition-colors",
