@@ -26,7 +26,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             ->withCount('pins')
             ->latest()
             ->get();
-        
+
         return Inertia::render('Boards/Index', [
             'boards' => ['data' => $boards]
         ]);
@@ -53,6 +53,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
             'availablePins' => ['data' => $availablePins]
         ]);
     })->name('boards.show');
+
+    Route::get('/pins/create', [PinController::class, 'create'])->name('pins.create');
+    Route::post('/pins', [PinController::class, 'store'])->name('pins.store');
 
     // Pin detail page
     Route::get('/pin/{pin}', [PinController::class, 'show'])->name('pins.show');

@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('pins', function (Blueprint $table) {
             $table->id();
-            $table->text('image_url');
+            $table->text('image_url')->nullable();
             $table->string('title', 255)->nullable();
             $table->text('description')->nullable();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();

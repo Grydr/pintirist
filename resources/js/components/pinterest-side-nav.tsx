@@ -4,6 +4,7 @@ import { Link } from "@inertiajs/react";
 import { Home, Compass, LayoutGrid, Plus, Bell, MessageCircleMore, Settings, User } from "lucide-react";
 import { usePage } from "@inertiajs/react";
 import type { SharedData } from "@/types";
+import { create } from "@/routes/pins";
 
 interface PinterestSideNavProps {
   active?: string;
@@ -28,13 +29,13 @@ const itemKeys = {
 
 export default function PinterestSideNav({ active, onSelect = () => {} }: PinterestSideNavProps) {
   const { auth } = usePage<SharedData>().props;
-  
+
   // Auto-detect active menu based on current URL if not explicitly set
   const getActiveMenu = (): string => {
     if (active) return active;
-    
+
     const currentPath = window.location.pathname;
-    
+
     if (currentPath.startsWith('/settings')) return 'settings';
     if (currentPath.startsWith('/boards')) return itemKeys.BOARDS;
     if (currentPath.startsWith('/dashboard')) return itemKeys.HOME;
@@ -43,10 +44,10 @@ export default function PinterestSideNav({ active, onSelect = () => {} }: Pinter
     if (currentPath.startsWith('/notifications') || currentPath.startsWith('/updates')) return itemKeys.UPDATES;
     if (currentPath.startsWith('/messages')) return itemKeys.MESSAGES;
     if (currentPath === '/') return itemKeys.HOME;
-    
+
     return itemKeys.HOME; // default
   };
-  
+
   const activeMenu = getActiveMenu();
 
   const topItems: NavItem[] = [
