@@ -61,6 +61,7 @@ export default function CreatePin() {
               type="file"
               accept="image/*"
               onChange={(e) => setData('image', e.target.files?.[0] ?? null)}
+              className='button bg-gray-200 rounded-xl w-[15rem] text-center'
               required
             />
             {errors.image && <p className="text-sm text-red-600 mt-1">{errors.image}</p>}
@@ -94,18 +95,6 @@ export default function CreatePin() {
               maxLength={1000}
             />
             {errors.description && <p className="text-sm text-red-600 mt-1">{errors.description}</p>}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-1">Link (optional)</label>
-            <input
-              type="url"
-              className="w-full rounded-lg border px-3 py-2"
-              value={data.link ?? ''}
-              onChange={(e) => setData('link', e.target.value)}
-              placeholder="https://example.com"
-            />
-            {errors.link && <p className="text-sm text-red-600 mt-1">{errors.link}</p>}
           </div>
 
           <div className="flex gap-3">
