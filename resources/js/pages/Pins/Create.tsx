@@ -61,7 +61,7 @@ export default function CreatePin() {
               type="file"
               accept="image/*"
               onChange={(e) => setData('image', e.target.files?.[0] ?? null)}
-              className='button bg-gray-200 rounded-2xl w-[15rem] text-center'
+              className='button bg-gray-200 rounded-xl w-[15rem] text-center'
               required
             />
             {errors.image && <p className="text-sm text-red-600 mt-1">{errors.image}</p>}
